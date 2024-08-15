@@ -37,6 +37,13 @@ resource "azurerm_subnet" "internal" {
   address_prefixes     = ["10.0.0.0/29"]
 }
 
+resource "azurerm_public_ip" "public_ip" {
+  name                = "terraform-public-ip"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Dynamic"
+}
+
 resource "azurerm_network_interface" "main" {
   name                = "terraform-nic"
   resource_group_name = azurerm_resource_group.main.name
@@ -46,6 +53,7 @@ resource "azurerm_network_interface" "main" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
@@ -55,11 +63,10 @@ resource "azurerm_linux_virtual_machine" "main" {
   location                        = "Central India"
   size                            = "Standard_D2s_v3"
   admin_username                  = "adminuser"
-  admin_password                  = "@@12345678"
+  admin_password                  = "Strongpass@2024"
+  computer_name                   = "terraform-vm"
   disable_password_authentication = false
-  network_interface_ids = [
-    azurerm_network_interface.main.id,
-  ]
+  network_interface_ids           = [azurerm_network_interface.main.id]
 
   source_image_reference {
     publisher = "Canonical"
@@ -69,6 +76,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   os_disk {
+    name                 = "terraform-vm_OsDisk"
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
   }
