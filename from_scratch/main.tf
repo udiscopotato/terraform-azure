@@ -12,7 +12,7 @@ terraform {
   required_version = ">= 1.0.0"
   backend "azurerm" {
     resource_group_name  = "demo-rg"
-    storage_account_name = "terraformstorageacc"
+    storage_account_name = "demostoragge399"
     container_name       = "tfstates"
     key                  = "demo-terraform.tfstate"
   }
